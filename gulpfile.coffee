@@ -25,7 +25,6 @@ sourcemaps = require 'gulp-sourcemaps'
 
 babelify = require 'babelify'
 
-ejs = require 'gulp-ejs'
 jade = require 'gulp-jade'
 htmlhint = require 'gulp-htmlhint'
 prettify = require 'gulp-prettify'
@@ -57,15 +56,9 @@ buildCss          = './build/css'
 srcImg            = './src/img'
 buildImg          = './build/img'
 DEST              = './dist'
-SRC               = './src'
-
-#ejsjson
-#ejsJson = require 'gulp-ejs-json'
 
 #sprite
 spritesmith = require 'gulp.spritesmith'
-
-#_ = require 'underscore'
 
 #cash用
 rev = require 'gulp-rev'
@@ -73,7 +66,9 @@ revReplace = require 'gulp-rev-replace'
 useref = require 'gulp-useref'
 gulpif = require 'gulp-if'
 
-
+#cssファイルに乱数を付与
+#dist以下にrev-manifest.jsonが生成
+#task revreplaceでjson内の名前に変更
 gulp.task 'index', ->
     gulp.src([
         'dist/css/*.css'
@@ -280,7 +275,6 @@ gulp.task 'copyfont', ->
 
 gulp.task 'watch', ->
     gulp.watch [stylusPath + '/*.styl',stylusPath + '/_partial/*.styl'], ['stylusReload']
-    #    gulp.watch ['src/ejs/**/*.ejs', 'src/ejs/**/_*.ejs'], ['ejsReload','htmlhint','htmlprettify']
     gulp.watch ['src/jade/**/*.jade', 'src/jade/**/_*.jade'], ['jadeReload','htmlhint','htmlprettify']
     gulp.watch ['src/js/*.js'], ['jsReload','vue']
     gulp.watch ['src/js/lib/*.js'], ['jsBundle' ,'bsReload']
