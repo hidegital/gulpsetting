@@ -90,8 +90,8 @@ gulp.task 'index', ->
 gulp.task 'revreplace', ->
     manifest = gulp.src('./dist' + '/rev-manifest.json')
     gulp.src('./dist' + '/index.html')
-        .pipe(revReplace(manifest: manifest))
-        .pipe gulp.dest('./build')
+    .pipe(revReplace(manifest: manifest))
+    .pipe gulp.dest('./build')
 
 #js
 gulp.task 'js', ->
@@ -106,6 +106,12 @@ gulp.task 'js', ->
 
 gulp.task 'jsReload', (callback) ->
     runSequence 'js', 'bsReload', callback
+
+#vue
+gulp.task 'vue', ->
+    gulp.src ('./src/js/vue_form_valid.js')
+    .pipe gulp.dest distJs
+
 
 #server
 gulp.task 'browserSync', ->
@@ -140,7 +146,7 @@ gulp.task 'cleanCss', ->
     del('./dist/css/*.css')
 
 gulp.task 'stylusReload', (callback) ->
-  runSequence 'cleanCss','stylus', 'bsReload', callback
+    runSequence 'cleanCss','stylus', 'bsReload', callback
 
 #templeteに変数を渡す jadeのjsonと同時に使えない
 #consolidateOptions =
@@ -151,31 +157,23 @@ gulp.task 'stylusReload', (callback) ->
 #htmltemplate
 gulp.task 'jade', ->
     gulp.src ["src/jade/**/*.jade",'!' + "src/jade/**/_*.jade"]
-        .pipe(data((file) ->
-            require './src/data/list.json'
-        ))
-        .pipe plumber()
-        .pipe jade(
-            pretty: true
-        )
-        .pipe gulp.dest DEST
+    .pipe(data((file) ->
+        require './src/data/list.json'
+    ))
+    .pipe plumber()
+    .pipe jade(
+        pretty: true
+    )
+    .pipe gulp.dest DEST
 
 gulp.task 'jadeReload', (callback) ->
     runSequence 'jade', 'bsReload', callback
 
-#gulp.task 'ejs', ->
-#    gulp.src ["src/ejs/**/*.ejs",'!' + "src/ejs/**/_*.ejs"]
-#    .pipe plumber()
-#    .pipe ejs()
-#    .pipe gulp.dest DEST
-
-#gulp.task 'ejsReload', (callback) ->
-#    runSequence 'ejs', 'bsReload', callback
 
 gulp.task 'htmlhint', ->
     gulp.src('./dist/*.html')
-        .pipe htmlhint()
-        .pipe htmlhint.reporter()
+    .pipe htmlhint()
+    .pipe htmlhint.reporter()
 
 #sprite
 gulp.task 'spriteStylus', ->
@@ -197,9 +195,9 @@ gulp.task 'imagemin', ->
     dstGlob = buildImg;
     imageminOptions = optimizationLevel: 7
     gulp.src [srcImg + '/**/*.+(jpg|jpeg|png|gif|svg)','!' + srcImg + '/sprite/*.+(jpg|jpeg|png|gif|svg)']
-        .pipe imagemin(imageminOptions)
-        .pipe gulp.dest(dstGlob)
-        .pipe gulp.dest('dist/img/')
+    .pipe imagemin(imageminOptions)
+    .pipe gulp.dest(dstGlob)
+    .pipe gulp.dest('dist/img/')
 
 
 #imageresize用 resizeOptionsでサイズは指定
@@ -230,56 +228,61 @@ gulp.task 'image-optim:thumb', ->
 #圧縮系
 gulp.task 'cssmin', ->
     gulp.src [distCss + '/*.css']
-        .pipe concat('style.css')
-        .pipe cssmin()
-        .pipe gulp.dest(buildCss)
+    .pipe concat('style.css')
+    .pipe cssmin()
+    .pipe gulp.dest(buildCss)
 
 gulp.task 'jsmin', ->
     gulp.src [distJs + '/*.js']
-        .pipe uglify(preserveComments: 'some')
-        .pipe gulp.dest(buildJs)
+    .pipe uglify(preserveComments: 'some')
+    .pipe gulp.dest(buildJs)
 
 gulp.task 'jsBundle', ->
     gulp.src ['./src/js/lib/*.js']
-        .pipe concat('bundle.min.js')
-        .pipe uglify(preserveComments: 'some')
-        .pipe gulp.dest(distJs + '/lib')
+    .pipe concat('bundle.min.js')
+    .pipe uglify(preserveComments: 'some')
+    .pipe gulp.dest(distJs + '/lib')
 
 gulp.task 'buildJsBundle', ->
     gulp.src (distJs + '/lib/bundle.min.js')
-        .pipe gulp.dest('build/js/lib/')
+    .pipe gulp.dest('build/js/lib/')
 
 gulp.task 'htmlprettify', ->
-    gulp.src(DEST + '/*.html')
-        .pipe prettify({indent_size: 2})
-        .pipe gulp.dest('./build')
+    gulp.src ['dist/*.html' , 'dist/**/*.html']
+    .pipe prettify({indent_size: 2})
+    .pipe gulp.dest('./build')
 
 
 gulp.task 'json', ->
     gulp.src('src/data/*.json')
-        .pipe jsonminify()
-        .pipe gulp.dest('./build/data')
+    .pipe jsonminify()
+    .pipe gulp.dest('./build/data')
 
 gulp.task 'distjson', ->
     gulp.src ('src/data/*.json')
-        .pipe jsonminify()
-        .pipe gulp.dest('dist/data')
+    .pipe jsonminify()
+    .pipe gulp.dest('dist/data')
 
 gulp.task 'copyimg', ->
-    gulp.src ('src/img/**')
-        .pipe gulp.dest('dist/img')
+    gulp.src ['src/img/**']
+    .pipe gulp.dest('dist/img')
 
 gulp.task 'imgclean', ->
-    del(['dist/img/*.+(jpg|jpeg|png|gif|svg)','dist/img/**/*.+(jpg|jpeg|png|gif|svg)'])
+    del(['dist/img/*.+(jpg|jpeg|png|gif|svg)','dist/img/**/*.+(jpg|jpeg|png|gif|svg)','!' + 'dist/img/sprite/**'])
 
 gulp.task 'cleanDir', ->
     del('./build/*')
 
+gulp.task 'copyfont', ->
+    gulp.src ('src/font/**')
+    .pipe gulp.dest('dist/font')
+    .pipe gulp.dest('build/font')
+
 gulp.task 'watch', ->
     gulp.watch [stylusPath + '/*.styl',stylusPath + '/_partial/*.styl'], ['stylusReload']
-#    gulp.watch ['src/ejs/**/*.ejs', 'src/ejs/**/_*.ejs'], ['ejsReload','htmlhint','htmlprettify']
+    #    gulp.watch ['src/ejs/**/*.ejs', 'src/ejs/**/_*.ejs'], ['ejsReload','htmlhint','htmlprettify']
     gulp.watch ['src/jade/**/*.jade', 'src/jade/**/_*.jade'], ['jadeReload','htmlhint','htmlprettify']
-    gulp.watch ['src/js/*.js'], ['jsReload']
+    gulp.watch ['src/js/*.js'], ['jsReload','vue']
     gulp.watch ['src/js/lib/*.js'], ['jsBundle' ,'bsReload']
     gulp.watch ['src/img/*.+(jpg|jpeg|png|gif|svg)','src/img/**/*.+(jpg|jpeg|png|gif|svg)'], ['imgclean','copyimg']
 
@@ -288,13 +291,13 @@ gulp.task 'watch', ->
 #gulp.task 'default', ['watch', 'browserSync','copyimg','distjson','jsBundle']
 gulp.task 'default', (callback) ->
     runSequence 'stylusReload','jadeReload','jsReload',
-                ['watch', 'browserSync','copyimg','distjson','jsBundle'], callback
+      ['watch', 'browserSync','copyimg','distjson','jsBundle'], callback
 
 
 #delが上手くいかない時があるのでエラーが出たら再度叩く
 gulp.task 'build', (callback) ->
     runSequence 'imgclean',
-                ['imagemin','cssmin','jsmin','htmlprettify','json','buildJsBundle'], callback
+      ['imagemin','cssmin','jsmin','htmlprettify','json','buildJsBundle'], callback
 
 #build
 #cleanDir,imgclean
