@@ -281,6 +281,7 @@ gulp.task 'watch', ->
     gulp.watch ['src/img/*.+(jpg|jpeg|png|gif|svg)','src/img/**/*.+(jpg|jpeg|png|gif|svg)'], ['imgclean','copyimg']
 
 
+
 #task
 #gulp.task 'default', ['watch', 'browserSync','copyimg','distjson','jsBundle']
 gulp.task 'default', (callback) ->
